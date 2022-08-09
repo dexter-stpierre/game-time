@@ -1,18 +1,21 @@
-export const gameTypes = [
+import { GAME_TYPES } from 'types/gameTypes';
+import { Game } from 'types/game';
+
+export const gameTypes: Game[] = [
   {
-    type: 'HIGH_SCORE',
+    gameType: GAME_TYPES.HIGH_SCORE,
     name: 'High Score',
   },
   {
-    type: 'LOW_SCORE',
+    gameType: GAME_TYPES.LOW_SCORE,
     name: 'Low Score',
   },
   {
-    type: 'FASTEST_TIME',
+    gameType: GAME_TYPES.FASTEST_TIME,
     name: 'Fastest Time',
   },
   {
-    type: 'OUTRIGHT_WINNER',
+    gameType: GAME_TYPES.OUTRIGHT_WINNER,
     name: 'Outright Winner',
   },
 ]

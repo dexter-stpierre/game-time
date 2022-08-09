@@ -5,6 +5,9 @@ import { Container, CssBaseline } from '@mui/material'
 
 function MyApp({ Component, pageProps }: AppProps) {
   return <>
+    <Head>
+      <meta name="viewport" content="initial-scale=1, width=device-width" />
+    </Head>
     <CssBaseline />
     <Container>
       <Component {...pageProps} />
