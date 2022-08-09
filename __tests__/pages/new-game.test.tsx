@@ -1,11 +1,12 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import NewGame from '../../pages/new-game';
 import '@testing-library/jest-dom'
 import userEvent from '@testing-library/user-event';
 import mockRouter from "next-router-mock";
-import localForage from 'localforage'
-import { Game } from 'types/game';
 import { gameStore } from 'data/store';
+import { getMaxIdForStore } from 'utils/getMaxIdForStore';
+import { addAndExpectGame } from 'testingUtils/addAndExpectGame';
+import { GAME_TYPES } from 'types/gameTypes';
 
 describe('New Game', () => {
   beforeEach(async () => {
@@ -57,27 +58,40 @@ describe('New Game', () => {
 
   it('Allows you save a game', async () => {
     render(<NewGame />);
-    expect(mockRouter.pathname).toBe('/new-game')
 
+    await addAndExpectGame({
+      name: 'Golf',
+      gameType: GAME_TYPES.LOW_SCORE
+    })
+  })
+
+  it('Increments the keys when adding multiple games', async () => {
+    render(<NewGame />);
     const nameInput = await screen.findByLabelText<HTMLInputElement>('Game Name')
-    await userEvent.type(nameInput, 'Golf')
-    expect(nameInput.value).toBe('Golf')
 
-    const selectInput = await screen.findByLabelText<HTMLSelectElement>('Game Type');
-    const lowScoreOption = await screen.findByRole<HTMLOptionElement>('option', { name: 'Low Score' })
-    await userEvent.selectOptions(
-      selectInput,
-      lowScoreOption,
-    )
-    expect(lowScoreOption.selected).toBe(true)
+    await addAndExpectGame({
+      name: 'Golf',
+      gameType: GAME_TYPES.LOW_SCORE
+    })
+    let highestId = await getMaxIdForStore(gameStore)
+    expect(highestId).toBe(1)
 
-    const submitButton = await screen.findByRole('button', { name: 'Submit' });
-    expect(submitButton).toBeInTheDocument();
-    await userEvent.click(submitButton)
-    await waitFor(() => expect(mockRouter.pathname).toBe('/'))
+    mockRouter.setCurrentUrl('/new-game');
+    await userEvent.clear(nameInput)
+    await addAndExpectGame({
+      name: 'Ticket to Ride',
+      gameType: GAME_TYPES.HIGH_SCORE
+    })
+    highestId = await getMaxIdForStore(gameStore)
+    expect(highestId).toBe(2)
 
-    const item = await gameStore.getItem<Game>('Golf')
-    console.log(item)
-    return expect(item?.name).toBe('Golf')
+    mockRouter.setCurrentUrl('/new-game');
+    await userEvent.clear(nameInput)
+    await addAndExpectGame({
+      name: 'Golf',
+      gameType: GAME_TYPES.LOW_SCORE
+    })
+    highestId = await getMaxIdForStore(gameStore)
+    expect(highestId).toBe(3)
   })
 })

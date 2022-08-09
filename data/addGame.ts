@@ -1,6 +1,12 @@
 import { gameStore } from 'data/store';
 import { Game } from 'types/game';
+import { getNextIdForStore } from 'utils/getNextIdForStore';
 
 export const addGame = async (game: Game): Promise<Game> => {
-  return gameStore.setItem(game.name, game);
+  const nextId = await getNextIdForStore(gameStore);
+  const savedGame = await gameStore.setItem(nextId + '', {
+    id: nextId,
+    ...game,
+  });
+  return savedGame
 }

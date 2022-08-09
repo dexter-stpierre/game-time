@@ -12,7 +12,6 @@ const NewGame = () => {
   const [gameType, setGameType] = useState<GAME_TYPES>(GAME_TYPES.HIGH_SCORE);
 
   const saveGame: FormEventHandler = async (event) => {
-    console.log('saveGame');
     event.preventDefault();
 
     const game = {
